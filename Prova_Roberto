@@ -1,0 +1,180 @@
+Microsoft Windows [versão 10.0.22621.1848]
+(c) Microsoft Corporation. Todos os direitos reservados.
+
+C:\Users\LEONARDO> cd C:\Program Files\PostgreSQL\14\bin
+
+C:\Program Files\PostgreSQL\14\bin> psql -U postgres -p 5433
+Password for user postgres:
+psql (14.8)
+WARNING: Console code page (850) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE DATABASE vendas_db;
+CREATE DATABASE
+postgres=# CREATE USER venda WITH PASSWORD '12345';
+CREATE ROLE
+postgres=# GRANT ALL PRIVILEGES ON DATABASE vendas_db TO venda;
+GRANT
+postgres=# \q
+
+C:\Program Files\PostgreSQL\14\bin> psql -U venda -p 5433 -d vendas_db
+Password for user venda:
+psql (14.8)
+WARNING: Console code page (850) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+vendas_db=> CREATE TABLE Cliente (
+vendas_db(>   cpf NUMERIC NOT NULL,
+vendas_db(>   nome VARCHAR(50) NOT NULL,
+vendas_db(>   uf VARCHAR(2) NOT NULL,
+vendas_db(>   CONSTRAINT cliente_pk PRIMARY KEY (cpf)
+vendas_db(> );
+CREATE TABLE
+vendas_db=>
+vendas_db=> CREATE TABLE Pedido (
+vendas_db(>   codigo INTEGER NOT NULL,
+vendas_db(>   cpf NUMERIC NOT NULL,
+vendas_db(>   data DATE NOT NULL,
+vendas_db(>   status VARCHAR(1) NOT NULL,
+vendas_db(>   CONSTRAINT pedido_pk PRIMARY KEY (codigo)
+vendas_db(> );
+CREATE TABLE
+vendas_db=>
+vendas_db=> CREATE TABLE Produto (
+vendas_db(>   codigo INTEGER NOT NULL,
+vendas_db(>   nome VARCHAR(50) NOT NULL,
+vendas_db(>   preco NUMERIC NOT NULL,
+vendas_db(>   categoria VARCHAR(30) NOT NULL,
+vendas_db(>   ativo BOOLEAN,
+vendas_db(>   CONSTRAINT produto_pk PRIMARY KEY (codigo)
+vendas_db(> );
+CREATE TABLE
+vendas_db=>
+vendas_db=> CREATE TABLE ItemPedido (
+vendas_db(>   pedido INTEGER NOT NULL,
+vendas_db(>   produto INTEGER NOT NULL,
+vendas_db(>   quantidade INTEGER NOT NULL,
+vendas_db(>   CONSTRAINT itempedido_pk PRIMARY KEY (pedido, produto)
+vendas_db(> );
+CREATE TABLE
+vendas_db=>
+vendas_db=> ALTER TABLE Pedido     ADD CONSTRAINT cliente_pedido_fk     FOREIGN KEY (cpf)     REFERENCES Cliente (cpf);
+ALTER TABLE
+vendas_db=> ALTER TABLE ItemPedido ADD CONSTRAINT pedido_itempedido_fk  FOREIGN KEY (pedido)  REFERENCES Pedido  (codigo);
+ALTER TABLE
+vendas_db=> ALTER TABLE ItemPedido ADD CONSTRAINT produto_itempedido_fk FOREIGN KEY (produto) REFERENCES Produto (codigo);
+ALTER TABLE
+vendas_db=> INSERT INTO CLIENTE (CPF, NOME, UF) VALUES ('111','João','MG');
+INSERT 0 1
+vendas_db=> INSERT INTO CLIENTE (CPF, NOME, UF) VALUES ('222','Jeane','SP');
+INSERT 0 1
+vendas_db=> INSERT INTO CLIENTE (CPF, NOME, UF) VALUES ('333','Joaquim','MG');
+INSERT 0 1
+vendas_db=> INSERT INTO CLIENTE (CPF, NOME, UF) VALUES ('444','Jane','SP');
+INSERT 0 1
+vendas_db=> INSERT INTO CLIENTE (CPF, NOME, UF) VALUES ('555','Jonas','RJ');
+INSERT 0 1
+vendas_db=>
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA, ATIVO) VALUES ('111','P1',10,'Alimento', true);
+INSERT 0 1
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA, ATIVO) VALUES ('222','P2',20,'Limpeza', true);
+INSERT 0 1
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA, ATIVO) VALUES ('333','P3',15,'Açougue', true);
+INSERT 0 1
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA, ATIVO) VALUES ('444','P4',5,'Limpeza', false);
+INSERT 0 1
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA, ATIVO) VALUES ('555','P5',10,'Alimento', false);
+INSERT 0 1
+vendas_db=> INSERT INTO PRODUTO (CODIGO, NOME, PRECO, CATEGORIA) VALUES ('666','P6',20,'Higiene');
+INSERT 0 1
+vendas_db=>
+vendas_db=> INSERT INTO PEDIDO (CODIGO, CPF, DATA, STATUS) VALUES (1,'222','01/06/2023','N');
+INSERT 0 1
+vendas_db=> INSERT INTO PEDIDO (CODIGO, CPF, DATA, STATUS) VALUES (2,'222','02/06/2023','A');
+INSERT 0 1
+vendas_db=> INSERT INTO PEDIDO (CODIGO, CPF, DATA, STATUS) VALUES (3,'444','03/06/2023','P');
+INSERT 0 1
+vendas_db=> INSERT INTO PEDIDO (CODIGO, CPF, DATA, STATUS) VALUES (4,'555','04/06/2023','F');
+INSERT 0 1
+vendas_db=> INSERT INTO PEDIDO (CODIGO, CPF, DATA, STATUS) VALUES (5,'222','05/06/2023','E');
+INSERT 0 1
+vendas_db=>
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (1,'111',5);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (1,'222',3);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (2,'333',1);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (3,'444',5);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (3,'555',3);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (3,'111',1);
+INSERT 0 1
+vendas_db=> INSERT INTO ITEMPEDIDO (PEDIDO, PRODUTO, QUANTIDADE) VALUES (4,'222',5);
+INSERT 0 1
+
+(QUESTAO - 1)
+vendas_db=> CREATE TABLE AVALIACAO (
+vendas_db(> CPF NUMERIC NOT NULL,
+vendas_db(> CODIGO INTEGER NOT NULL,
+vendas_db(> DATA DATE NOT NULL,
+vendas_db(> NOTA INTEGER NOT NULL,
+vendas_db(> CONSTRAINT AVALIACAO_PK PRIMARY KEY (CPF, CODIGO, DATA)
+vendas_db(> );
+CREATE TABLE
+
+(QUESTAO - 2)
+vendas_db=> ALTER TABLE AVALIACAO ADD CONSTRAINT AVALIACAO_CLIENTE_FK FOREIGN KEY (CPF) REFERENCES CLIENTE (CPF);
+ALTER TABLE
+vendas_db=> ALTER TABLE AVALIACAO ADD CONSTRAINT AVALIACAO_PRODUTO_FK FOREIGN KEY (CODIGO) REFERENCES PRODUTO (CODIGO);
+ALTER TABLE
+
+(QUESTAO - 3)
+vendas_db=> UPDATE ITEMPEDIDO SET QUANTIDADE = 5 WHERE PRODUTO = 111 AND PEDIDO = 3;
+UPDATE 1
+
+(QUESTAO - 4)
+vendas_db=> INSERT INTO AVALIACAO (CPF, CODIGO, DATA, NOTA) VALUES (222, 111, '15/06/23', 5);
+INSERT 0 1
+vendas_db=> INSERT INTO AVALIACAO (CPF, CODIGO, DATA, NOTA) VALUES (333, 222, '15/06/23', 4);
+INSERT 0 1
+vendas_db=> INSERT INTO AVALIACAO (CPF, CODIGO, DATA, NOTA) VALUES (222, 111, '15/06/23', 4);
+ERROR:  duplicate key value violates unique constraint "avaliacao_pk"
+DETAIL:  Key (cpf, codigo, data)=(222, 111, 2023-06-15) already exists.
+
+(QUESTAO - 5)  
+PORQUE SE REPETEM AS 3 CHAVES PRIMARIAS DA TABELA AVALIACAO (CPF, CODIGO E DATA) DA 1º E 3º LINHA.
+
+(QUESTAO - 6)                                                      ^
+vendas_db=> SELECT codigo from Pedido WHERE status = 'A' OR status = 'E' OR status = 'N' AND cpf = 222;
+ codigo
+--------
+      1
+      2
+      5
+(3 rows)                                         ^
+vendas_db=> SELECT PRODUTO, QUANTIDADE from ITEMPEDIDO WHERE PEDIDO = 3;
+ produto | quantidade
+---------+------------
+     444 |          5
+     555 |          3
+     111 |          5
+(3 rows)
+vendas_db=> SELECT CODIGO from PRODUTO WHERE ATIVO = FALSE OR ATIVO IS NULL;
+ codigo
+--------
+    444
+    555
+    666
+(3 rows)
+
+(QUESTAO - 7)
+vendas_db=>  DELETE FROM PRODUTO WHERE CODIGO = 222;
+ERROR:  update or delete on table "produto" violates foreign key constraint "produto_itempedido_fk" on table "itempedido"
+DETAIL:  Key (codigo)=(222) is still referenced from table "itempedido".
+vendas_db=>  PORQUE CODIGO É CHAVE ESTRANGEIRA NA TABELA AVALIACAO E ITEMPEDIDO.
